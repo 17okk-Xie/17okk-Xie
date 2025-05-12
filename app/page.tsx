@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useScroll, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { TypingAnimation } from "../components/typing-animation";
 import { Meteors } from "../components/magicui/meteors";
 import Image from "next/image";
