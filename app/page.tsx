@@ -1,21 +1,17 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, AnimatePresence } from "framer-motion";
 import { TypingAnimation } from "../components/typing-animation";
 import { Meteors } from "../components/magicui/meteors";
 import Image from "next/image";
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
-  const { scrollYProgress } = useScroll();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showNavbar, setShowNavbar] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
-      
       // Show navbar after scrolling down to approximately the second screen
       const viewportHeight = window.innerHeight;
       setShowNavbar(window.scrollY > viewportHeight * 0.7);
@@ -162,7 +158,7 @@ export default function Home() {
         <section className="h-screen flex items-center justify-center relative">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-              Hi, I'm{" "}
+              Hi, I&apos;m{" "}
               <TypingAnimation
                 words={["落花生", "Yixi Xie", "a Programmer", "a Video Editor"]}
                 className="text-cyan-400 text-glow"
@@ -264,10 +260,10 @@ export default function Home() {
             <h2 className="text-3xl md:text-5xl font-bold mb-8 text-white">About Me</h2>
             <p className="text-lg text-gray-300 mb-8">
               Programmer by day, video editor by night—crafting code and cinematic cuts with equal flair.<br />
-              I'll expand your horizons and bring your ideas to life by designing the coolest interfaces and gadgets.
+              I&apos;ll expand your horizons and bring your ideas to life by designing the coolest interfaces and gadgets.
             </p>
             <p className="text-lg text-gray-300">
-              Feel free to explore my portfolio and get in touch if you'd like to collaborate on a project.
+              Feel free to explore my portfolio and get in touch if you&apos;d like to collaborate on a project.
             </p>
           </motion.div>
         </section>

@@ -16,6 +16,16 @@ interface ParticlesProps {
   maxSize?: number;
 }
 
+interface Circle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  color: string;
+}
+
 export const Particles = ({
   className,
   quantity = 50,
@@ -31,7 +41,7 @@ export const Particles = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
-  const circles = useRef<any[]>([]);
+  const circles = useRef<Circle[]>([]);
   const mousePosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [canvasSize, setCanvasSize] = useState<{
@@ -51,10 +61,12 @@ export const Particles = ({
     return () => {
       window.removeEventListener("resize", initCanvas);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     initCanvas();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   const initCanvas = () => {
@@ -103,7 +115,7 @@ export const Particles = ({
 
   const drawParticles = () => {
     circles.current = [];
-    for (let i = 0; i < quantity; i++) {
+    for (let index = 0; index < quantity; index++) {
       circles.current.push(circleParams());
     }
   };
@@ -114,7 +126,7 @@ export const Particles = ({
     }
   };
 
-  const drawCircle = (circle: any) => {
+  const drawCircle = (circle: Circle) => {
     if (context.current) {
       context.current.beginPath();
       context.current.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
@@ -127,7 +139,7 @@ export const Particles = ({
 
   const animate = () => {
     clearContext();
-    circles.current.forEach((circle, i) => {
+    circles.current.forEach((circle) => {
       // Handle movement
       circle.x += circle.vx * (staticity / 10);
       circle.y += circle.vy * (staticity / 10);
