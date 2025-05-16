@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TypingAnimation } from "../components/typing-animation";
 import { Meteors } from "../components/magicui/meteors";
+import { Modal, ModalBody, ModalContent, ModalTrigger } from "../components/ui/animated-modal";
 import Image from "next/image";
 
 export default function Home() {
@@ -160,7 +161,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
               Hi, I&apos;m{" "}
               <TypingAnimation
-                words={["落花生", "Yixi Xie", "a Programmer", "a Video Editor"]}
+                words={["朔望", "Yixi Xie", "a Programmer", "a Video Editor"]}
                 className="text-cyan-400 text-glow"
                 cursorClassName="bg-cyan-400"
                 speed={80}
@@ -177,15 +178,37 @@ export default function Home() {
               transition={{ delay: 0.5 }}
               className="flex justify-center mb-12"
             >
-              <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-400/20">
-                <Image
-                  src="/images/Yixi.jpeg"
-                  alt="Yixi Xie"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+              <Modal>
+                <ModalTrigger className="cursor-pointer">
+                  <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-400/20 transition-all duration-300 hover:shadow-cyan-400/40 hover:scale-[1.02]">
+                    <Image
+                      src="/images/Yixi.jpeg"
+                      alt="Yixi Xie"
+                      title="v me 50"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                </ModalTrigger>
+                <ModalBody>
+                  <ModalContent>
+                    <div className="flex flex-col items-center">
+                      <h3 className="text-xl font-semibold mb-4">Connect with me on WeChat</h3>
+                      <div className="relative w-full aspect-square max-w-md overflow-hidden bg-white p-2 rounded-xl mb-3">
+                        <Image
+                          src="/images/QR-code.JPG"
+                          alt="WeChat QR Code"
+                          fill
+                          className="object-contain"
+                          priority
+                        />
+                      </div>
+                      <p className="text-sm text-gray-400 mt-2">Scan the QR code to add me as a friend.</p>
+                    </div>
+                  </ModalContent>
+                </ModalBody>
+              </Modal>
             </motion.div>
             
             <motion.div
@@ -209,7 +232,7 @@ export default function Home() {
               
               {/* Twitter/X */}
               <a
-                href="https://twitter.com/"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-cyan-400 transition-colors"
@@ -246,6 +269,49 @@ export default function Home() {
               </a>
             </motion.div>
           </div>
+          
+          {/* Scroll Down Indicator */}
+          <motion.div 
+            className="absolute bottom-8 left-0 right-0 flex flex-col items-center"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ 
+              opacity: [0.4, 1, 0.4], 
+              y: [-10, 0, -10] 
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity,
+              repeatType: "loop" 
+            }}
+          >
+            <p className="text-cyan-400 mb-2 text-sm font-medium tracking-wider">SCROLL DOWN</p>
+            <motion.div
+              animate={{ 
+                y: [0, 6, 0] 
+              }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: Infinity,
+                ease: "easeInOut" 
+              }}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                className="text-cyan-400"
+              >
+                <path d="M12 5v14"></path>
+                <path d="m19 12-7 7-7-7"></path>
+              </svg>
+            </motion.div>
+          </motion.div>
         </section>
         
         {/* Second screen - Content after scroll */}
