@@ -179,7 +179,7 @@ export default function Home() {
             >
               <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-400/20">
                 <Image
-                  src="/Yixi.jpeg"
+                  src="/images/Yixi.jpeg"
                   alt="Yixi Xie"
                   fill
                   className="object-cover"

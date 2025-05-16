@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
+import { BentoGridProps } from "../../components/bento-grid";
 import Link from "next/link";
 
 export default function SkillsPage() {
@@ -28,17 +29,19 @@ export default function SkillsPage() {
       </nav>
       
       {/* Content */}
-      <div className="relative z-10 pt-24">
+      <div className="relative z-10 pt-24 pb-16">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
+            className="max-w-5xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-8 text-white text-center">Skills</h1>
-            <div className="bg-black/30 backdrop-blur-sm p-8 rounded-lg">
-              <p className="text-gray-300 text-center">My skills will be displayed here soon.</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-8 text-white text-center">Skills & Expertise</h1>
+            
+            {/* BentoGrid Component */}
+            <div className="mt-8">
+              <BentoGridProps />
             </div>
           </motion.div>
         </div>
