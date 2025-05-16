@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
 import Link from "next/link";
 import Image from "next/image";
-import { Modal, ModalBody, ModalContent, ModalTrigger } from "../../components/ui/animated-modal";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
