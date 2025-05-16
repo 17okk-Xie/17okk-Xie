@@ -79,8 +79,7 @@ export const ModalBody = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
   const { setOpen } = useModal();
-  // @ts-ignore - The ref is correctly typed but TS is being too strict
-  useOutsideClick(modalRef, () => setOpen(false));
+  useOutsideClick(modalRef as React.RefObject<HTMLElement>, () => setOpen(false));
 
   return (
     <AnimatePresence>
@@ -222,15 +221,15 @@ const CloseIcon = () => {
 // Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
   ref: React.RefObject<HTMLElement | null>,
-  callback: Function
+  callback: () => void
 ) => {
   useEffect(() => {
-    const listener = (event: any) => {
+    const listener = (event: MouseEvent | TouchEvent) => {
       // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target)) {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
-      callback(event);
+      callback();
     };
 
     document.addEventListener("mousedown", listener);

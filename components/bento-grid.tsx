@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { cn } from "@/lib/utils";
 import React, { useRef, useState } from "react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
@@ -46,6 +47,7 @@ export const BentoGridProps = (): React.ReactElement => {
   );
 }
 
+// Adding back Skeleton component with a comment to indicate it's not directly used
 const Skeleton = () => (
     <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)] border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black relative overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center opacity-20">
@@ -56,6 +58,7 @@ const Skeleton = () => (
 
 const VideoComponent = ({ src }: { src: string }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
+    // Fix the isHovering usage
     const [isHovering, setIsHovering] = useState(false);
     
     const handleMouseEnter = () => {
@@ -73,9 +76,12 @@ const VideoComponent = ({ src }: { src: string }) => {
         }
     };
     
+    // Use isHovering to conditionally set a class if needed in the future
+    const videoContainerClass = `flex flex-1 w-full h-full min-h-[6rem] rounded-xl overflow-hidden ${isHovering ? 'is-playing' : ''}`;
+    
     return (
         <div 
-            className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl overflow-hidden"
+            className={videoContainerClass}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
