@@ -1,0 +1,27 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# CSS, JS, TS, JSON files should use LF line endings
+*.css text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.mjs text eol=lf
+
+# Configuration files
+*.config.js text eol=lf
+*.config.ts text eol=lf
+*.config.mjs text eol=lf
+tailwind.config.js text eol=lf
+next.config.ts text eol=lf
+eslint.config.mjs text eol=lf
+
+# Images should be treated as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf 
