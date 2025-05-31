@@ -151,7 +151,7 @@ export default function ContactPage() {
                     </div>
 
                     <div className="mt-6 pt-6 border-t border-neutral-800">
-                      <p className="text-sm text-gray-400">依旧开户/.</p>
+                      <p className="text-sm text-gray-400">Coming soon...</p>
                     </div>
 
                   </div>

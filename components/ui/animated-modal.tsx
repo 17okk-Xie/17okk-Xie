@@ -146,7 +146,17 @@ export const ModalContent = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("flex flex-col flex-1 p-8 md:p-10", className)}>
+    <div 
+      className={cn(
+        "flex flex-col flex-1 p-8 md:p-10 overflow-auto modal-content",
+        className
+      )}
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(156, 163, 175, 0.3) transparent',
+        msOverflowStyle: 'none'
+      }}
+    >
       {children}
     </div>
   );
