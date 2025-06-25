@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/cli": "^4.1.7",
     "class-variance-authority": "^0.7.1",
