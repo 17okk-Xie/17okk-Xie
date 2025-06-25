@@ -132,7 +132,7 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-400">Location</p>
-                          <p className="text-sm text-white">Greensboro, NC</p>
+                          <p className="text-sm text-white">Flushing, NY</p>
                         </div>
                       </div>
                       

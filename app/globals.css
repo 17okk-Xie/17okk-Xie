@@ -1,8 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* stylelint-disable-next-line at-rule-no-unknown */
 @custom-variant dark (&:is(.dark *));
 
+/* stylelint-disable-next-line at-rule-no-unknown */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -128,9 +130,11 @@
 
 @layer base {
   * {
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply border-border outline-ring/50;
   }
   body {
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-background text-foreground;
   }
 }

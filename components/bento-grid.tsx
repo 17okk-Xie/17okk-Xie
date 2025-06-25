@@ -307,6 +307,9 @@ const items: ItemType[] = [
           <div className="mt-3 pt-3 border-t border-neutral-700">
             <p className="text-sm text-gray-400 italic">
               Shown above: iHive platform presentation poster - a perfect example of translating complex concepts into visually engaging materials.
+              <br />
+              <br />
+              Live Demo: <a href="https://ihive.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-500 transition-colors">https://ihive.vercel.app/</a>
             </p>
           </div>
         </div>
