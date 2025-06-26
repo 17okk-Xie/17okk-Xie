@@ -122,15 +122,30 @@ export default function ContactPage() {
                 <div className="bg-black/50 backdrop-blur-md rounded-xl overflow-hidden border border-neutral-800/50 shadow-xl">
                   <div className="p-6">
                     <div className="flex flex-col items-center mb-6">
-                      <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-cyan-400 mb-4">
+                      <Link 
+                        href="/resume/Resume.pdf" 
+                        title="Click to view my resume"
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-cyan-400 mb-4 hover:border-cyan-300 transition-colors cursor-pointer group"
+                      >
                         <Image
                           src="/images/Yixi.jpeg"
-                          alt="Yixi Xie"
+                          alt="Click to view resume - Yixi Xie"
                           fill
-                          className="object-cover"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                           priority
                         />
-                      </div>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                          </svg>
+                        </div>
+                      </Link>
                       <h2 className="text-xl font-semibold text-white">Yixi Xie</h2>
                     </div>
                     
