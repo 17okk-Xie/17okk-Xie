@@ -28,7 +28,7 @@ export default function ProjectsPage() {
     },
     {
       id: 2,
-      title: "iHive Platform",
+      title: "iHive - CSC490 Capstone Project",
       description: "iHive is a GitHub-inspired repository platform for ideas, designed to connect innovators and investors. It enables users to showcase their ideas, find potential funding, and collaborate on impactful projects. With AI-powered tag generation, advanced search, and collaboration tools, iHive aims to revolutionize idea sharing.",
       tech: ["Next.js", "React", "TailwindCSS", "Node.js", "Express.js", "Supabase", "PostgreSQL", "Socket.io", "OpenAI API"],
       image: "/images/Poster-iHive.png",
@@ -38,16 +38,15 @@ export default function ProjectsPage() {
     },
     {
       id: 3,
-      title: "Spartan Esports Application",
+      title: "Spartan Esports - CSC340 Prototype",
       description: "A comprehensive esports management platform for UNCG. Features coach booking, user reviews, admin management, team coordination, and Steam API integration for game statistics.",
       tech: ["Java", "Spring Boot", "MySQL", "HTML", "CSS", "JavaScript", "Steam API"],
-      image: "/images/frontend.png",
       github: "https://github.com/AZubair-Iron/csc340-prototype",
       status: "Completed"
     },
     {
       id: 4,
-      title: "Salad - Fresh & Healthy E-commerce",
+      title: "Salad - E-commerce Website",
       description: "A modern e-commerce website for a premium salad business featuring responsive design, interactive menu with customization options, online ordering system, and location finder. Built with clean aesthetics and focus on fresh, healthy dining experience.",
       tech: ["Next.js", "TypeScript", "Tailwind CSS", "React Icons"],
       image: "/images/Salad.png",
@@ -57,7 +56,7 @@ export default function ProjectsPage() {
     },
     {
       id: 5,
-      title: "iTea - Chinese Tea E-commerce",
+      title: "iTea - CSC372 E-commerce Project",
       description: "A modern e-commerce website showcasing authentic Chinese tea culture. Features responsive design, product categories, tea heritage storytelling, customer testimonials, and newsletter subscription.",
       tech: ["Next.js", "React", "TypeScript", "TailwindCSS", "Vercel"],
       image: "/images/iTea.png",
@@ -70,7 +69,7 @@ export default function ProjectsPage() {
   const designProjects = [
     {
       id: 6,
-      title: "SAO",
+      title: "Sword Art Online",
       description: "Collection of After Effects animations and motion graphics projects showcasing creative design skills.",
       tech: ["After Effects"],
       video: "/videos/ae-prac.mp4",
