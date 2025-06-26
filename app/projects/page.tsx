@@ -92,7 +92,20 @@ export default function ProjectsPage() {
     }
   };
 
-  const ProjectCard = ({ project, index }: { project: any, index: number }) => (
+  interface Project {
+    id: number;
+    title: string;
+    description: string;
+    tech: string[];
+    image?: string;
+    video?: string;
+    github?: string;
+    demo?: string;
+    behance?: string;
+    status: string;
+  }
+
+  const ProjectCard = ({ project, index }: { project: Project, index: number }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -278,7 +291,7 @@ export default function ProjectsPage() {
             >
               <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 border border-neutral-800/50">
                 <h3 className="text-2xl font-semibold text-white mb-4">Interested in collaborating?</h3>
-                <p className="text-gray-400 mb-6">I'm always open to discussing new opportunities and interesting projects.</p>
+                <p className="text-gray-400 mb-6">I&apos;m always open to discussing new opportunities and interesting projects.</p>
                 <Link
                   href="/contact"
                   className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-cyan-500/20"
