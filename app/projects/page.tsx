@@ -69,12 +69,21 @@ export default function ProjectsPage() {
   const designProjects = [
     {
       id: 6,
-      title: "Sword Art Online",
-      description: "Collection of After Effects animations and motion graphics projects showcasing creative design skills.",
+      title: "Typography",
+      description: "Using After Effects to demonstrate and showcase ending typography layout concepts and design approaches, exploring creative motion graphics and visual storytelling techniques.",
       tech: ["After Effects"],
       video: "/videos/ae-prac.mp4",
       behance: "#",
       status: "Terminated"
+    },
+    {
+      id: 7,
+      title: "Transition", 
+      description: "Using After Effects to showcase transition effects and creative visual storytelling techniques.",
+      tech: ["After Effects"],
+      video: "/videos/ae-transition.mp4", 
+      behance: "#",
+      status: "Completed"
     }
   ];
 
