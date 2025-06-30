@@ -37,12 +37,13 @@ export default function ProjectsPage() {
       status: "Completed"
     },
     {
-      id: 3,
-      title: "Spartan Esports - CSC340 Prototype",
-      description: "A comprehensive esports management platform for UNCG. Features coach booking, user reviews, admin management, team coordination, and Steam API integration for game statistics.",
-      tech: ["Java", "Spring Boot", "MySQL", "HTML", "CSS", "JavaScript", "Steam API"],
-      github: "https://github.com/AZubair-Iron/csc340-prototype",
-      status: "Completed"
+      id: 3, 
+      title: "Playhub x Blueprint",
+      description: "A curated platform where stories, secrets, and strategy collide. The platform serves as a comprehensive library and inspiration hub for players, creators, and offline venues game cafes.",
+      tech: ["Next.js", "React", "TypeScript", "TailwindCSS", "Node.js", "Vercel"],
+      image: "/images/playhub-blueprint.png",
+      demo: "https://playhub-psi.vercel.app/",
+      status: "Ongoing"
     },
     {
       id: 4,
@@ -63,6 +64,14 @@ export default function ProjectsPage() {
       github: "https://github.com/17okk-Xie/tea-website",
       demo: "https://tea-website-zeta.vercel.app/",
       status: "Ongoing"
+    },
+    {
+      id: 8,
+      title: "Spartan Esports - CSC340 Prototype",
+      description: "A comprehensive esports management platform for UNCG. Features coach booking, user reviews, admin management, team coordination, and Steam API integration for game statistics.",
+      tech: ["Java", "Spring Boot", "MySQL", "HTML", "CSS", "JavaScript", "Steam API"],
+      github: "https://github.com/AZubair-Iron/csc340-prototype",
+      status: "Completed"
     }
   ];
 
