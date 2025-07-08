@@ -330,8 +330,8 @@ export default function Home() {
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-8 text-white">About Me</h2>
             <p className="text-lg text-gray-300 mb-8">
-              Passionate about building creative web experiences, leading projects, organizing ideas, 
-              and telling stories through video content and editing. 
+              Focused on creating engaging web experiences and storytelling through video. <br />
+              Skilled at organizing ideas and driving projects from concept to launch.
             </p>
             <p className="text-lg text-gray-300">
               Feel free to explore my portfolio and get in touch if you&apos;d like to collaborate on a project.
