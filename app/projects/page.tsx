@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
+import { Modal, ModalBody, ModalContent, ModalTrigger } from "../../components/ui/animated-modal";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -11,8 +12,7 @@ export default function ProjectsPage() {
 
   const categories = [
     { id: "programming", name: "Coding", icon: "🚀" },
-    { id: "design", name: "Media", icon: "🎨" },
-    { id: "others", name: "Others", icon: "📁" }
+    { id: "design", name: "Media", icon: "🎨" }
   ];
 
   const programmingProjects = [
@@ -78,56 +78,47 @@ export default function ProjectsPage() {
   const designProjects = [
     {
       id: 6,
-      title: "Typography",
-      description: "Using After Effects to demonstrate and showcase ending typography layout concepts and design approaches, exploring creative motion graphics and visual storytelling techniques.",
+      title: "Prototype",
+      description: "An experimental anime-inspired motion graphics prototype exploring advanced After Effects techniques. Created as a proof of concept for dynamic character animations and visual effects inspired by Sword Art Online's distinctive aesthetic and UI elements.",
       tech: ["After Effects"],
       video: "/videos/ae-prac.mp4",
-      behance: "#",
+      tags: ["Anime", "Prototype", "Sword Art Online"],
       status: "Terminated"
     },
     {
       id: 7,
       title: "Transition", 
-      description: "Using After Effects to showcase transition effects and creative visual storytelling techniques.",
+      description: "A showcase of advanced transition techniques and motion design principles. Demonstrates seamless scene transitions, dynamic camera movements, and sophisticated visual effects inspired by Wuthering Waves' cinematic style and game aesthetics.",
       tech: ["After Effects"],
-      video: "/videos/ae-transition.mp4", 
-      behance: "#",
+      video: "/videos/ae-transition.mp4",
+      tags: ["AE Techniques", "Transition", "Wuwa"],
       status: "Ongoing"
     },
     {
       id: 9, 
-      title: "Wuwa Edit - Sanhua", 
-      description: "The best 4-star | Sanhua  #WutheringWaves #ProjectWAVE",
-      tech: ["After Effects"], 
+      title: "Sanhua", 
+      description: "The best 4-star | Sanhua",
+      tech: ["After Effects"],
       video: "/videos/叱妖诰.mp4",
-      behance: "#", 
+      tags: ["Wuthering Waves", "Project WAVE", "Sanhua"], 
       status: "Completed"
     }
   ];
 
   const getFilteredProjects = () => {
-    switch(activeCategory) {
-      case "programming":
-        return programmingProjects;
-      case "design":
-        return designProjects;
-      case "others":
-        return [];
-      default:
-        return programmingProjects;
-    }
+    return activeCategory === "design" ? designProjects : programmingProjects;
   };
 
   interface Project {
     id: number;
     title: string;
-    description: string;
-    tech: string[];
+    description?: string;
+    tech?: string[];
     image?: string;
     video?: string;
     github?: string;
     demo?: string;
-    behance?: string;
+    tags?: string[];
     status: string;
   }
 
@@ -163,16 +154,13 @@ export default function ProjectsPage() {
           </div>
         )}
         
-        {/* Status Badge */}
         <div className="absolute top-4 right-4">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
             project.status === 'Completed' 
-              ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+              ? 'bg-green-500/20 text-green-400 border-green-500/30' 
               : project.status === 'Ongoing'
-              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-              : project.status === 'Terminated'
-              ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-              : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+              : 'bg-red-500/20 text-red-400 border-red-500/30'
           }`}>
             {project.status}
           </span>
@@ -184,11 +172,12 @@ export default function ProjectsPage() {
         <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">
           {project.title}
         </h3>
-        <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-          {project.description}
-        </p>
+        {project.description && (
+          <p className="text-gray-400 text-sm mb-4 line-clamp-3">
+            {project.description}
+          </p>
+        )}
 
-        {/* Tech Stack */}
         {project.tech && (
           <div className="flex flex-wrap gap-2 mb-4">
             {project.tech.map((tech: string, idx: number) => (
@@ -228,20 +217,62 @@ export default function ProjectsPage() {
               Live Demo
             </Link>
           )}
-          {(project.behance || project.video) && (
-            <Link
-              href={project.video || project.behance || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15,3 21,3 21,9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-              View
-            </Link>
+          {project.video && (
+            <Modal>
+              <ModalTrigger className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15,3 21,3 21,9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                View
+              </ModalTrigger>
+              <ModalBody className="w-full max-w-6xl mx-auto">
+                <ModalContent className="text-center">
+                  <h3 className="text-2xl font-semibold mb-6 text-black dark:text-white">{project.title}</h3>
+
+                  <div className="w-full aspect-video max-w-5xl mx-auto">
+                    <video
+                      className="w-full h-full rounded-lg object-contain bg-black"
+                      controls
+                      loop
+                      autoPlay
+                      playsInline
+                    >
+                      <source src={project.video} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                  
+                  {project.tags && (
+                    <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                      {project.tags.map((tag: string, idx: number) => (
+                        <div 
+                          key={idx}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium shadow-sm"
+                        >
+                          <svg 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className="text-gray-500 dark:text-gray-400"
+                          >
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                          </svg>
+                          {tag}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ModalContent>
+              </ModalBody>
+            </Modal>
           )}
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import React, {
   ReactNode,
   createContext,
@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalContextType {
   open: boolean;
@@ -79,62 +80,69 @@ export const ModalBody = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
   const { setOpen } = useModal();
-  useOutsideClick(modalRef as React.RefObject<HTMLElement>, () => setOpen(false));
+  useOutsideClick(modalRef, () => setOpen(false));
 
-  return (
+  if (typeof window === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-            backdropFilter: "blur(10px)",
-          }}
-          exit={{
-            opacity: 0,
-            backdropFilter: "blur(0px)",
-          }}
-          className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full  flex items-center justify-center z-50"
-        >
-          <Overlay />
-
+        <div className="fixed inset-0 z-[9999]" style={{ zIndex: 999999 }}>
           <motion.div
-            ref={modalRef}
-            className={cn(
-              "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
-              className
-            )}
             initial={{
               opacity: 0,
-              scale: 0.5,
-              rotateX: 40,
-              y: 40,
             }}
             animate={{
               opacity: 1,
-              scale: 1,
-              rotateX: 0,
-              y: 0,
+              backdropFilter: "blur(10px)",
             }}
             exit={{
               opacity: 0,
-              scale: 0.8,
-              rotateX: 10,
+              backdropFilter: "blur(0px)",
             }}
-            transition={{
-              type: "spring",
-              stiffness: 260,
-              damping: 15,
-            }}
+            className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full flex items-center justify-center z-[9999]"
+            style={{ zIndex: 999999 }}
           >
-            <CloseIcon />
-            {children}
+            <Overlay />
+
+            <motion.div
+              ref={modalRef}
+              className={cn(
+                "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-[9999] flex flex-col flex-1 overflow-hidden",
+                className
+              )}
+              style={{ zIndex: 999999 }}
+              initial={{
+                opacity: 0,
+                scale: 0.5,
+                rotateX: 40,
+                y: 40,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotateX: 0,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+                rotateX: 10,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 15,
+              }}
+            >
+              <CloseIcon />
+              {children}
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 
@@ -146,17 +154,7 @@ export const ModalContent = ({
   className?: string;
 }) => {
   return (
-    <div 
-      className={cn(
-        "flex flex-col flex-1 p-8 md:p-10 overflow-auto modal-content",
-        className
-      )}
-      style={{
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(156, 163, 175, 0.3) transparent',
-        msOverflowStyle: 'none'
-      }}
-    >
+    <div className={cn("flex flex-col flex-1 p-8 md:p-10", className)}>
       {children}
     </div>
   );
@@ -195,7 +193,8 @@ const Overlay = ({ className }: { className?: string }) => {
         opacity: 0,
         backdropFilter: "blur(0px)",
       }}
-      className={`fixed inset-0 h-full w-full bg-black bg-opacity-50 z-50 ${className}`}
+      className={`fixed inset-0 h-full w-full bg-black bg-opacity-50 z-[999998] ${className}`}
+      style={{ zIndex: 999998 }}
     ></motion.div>
   );
 };
@@ -205,7 +204,8 @@ const CloseIcon = () => {
   return (
     <button
       onClick={() => setOpen(false)}
-      className="absolute top-4 right-4 group"
+      className="absolute top-4 right-4 group z-[999999]"
+      style={{ zIndex: 999999 }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -228,18 +228,17 @@ const CloseIcon = () => {
 };
 
 // Hook to detect clicks outside of a component.
-// Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
-  ref: React.RefObject<HTMLElement | null>,
-  callback: () => void
+  ref: React.RefObject<HTMLDivElement | null>,
+  callback: Function
 ) => {
   useEffect(() => {
-    const listener = (event: MouseEvent | TouchEvent) => {
+    const listener = (event: any) => {
       // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target as Node)) {
+      if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
-      callback();
+      callback(event);
     };
 
     document.addEventListener("mousedown", listener);
