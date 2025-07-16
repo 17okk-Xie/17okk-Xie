@@ -92,6 +92,15 @@ export default function ProjectsPage() {
       tech: ["After Effects"],
       video: "/videos/ae-transition.mp4", 
       behance: "#",
+      status: "Ongoing"
+    },
+    {
+      id: 9, 
+      title: "Wuwa Edit", 
+      description: "Using After Effects to edit Wuthering Waves using transition effects and creative visual storytelling techniques.",
+      tech: ["After Effects"], 
+      video: "/videos/叱妖诰.mp4",
+      behance: "#", 
       status: "Completed"
     }
   ];

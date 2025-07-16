@@ -156,7 +156,7 @@ const items: ItemType[] = [
     {
       title: "Video Editing",
       description: "Adobe After Effects & Adobe Premiere Pro",
-      header: <VideoComponent src="/videos/ae-prac.mp4" />,
+      header: <VideoComponent src="/videos/ae-transition.mp4" />,
       className: "md:col-span-1",
       icon: <IconSettings className="h-4 w-4 text-neutral-500" />,
       modalContent: (
@@ -169,7 +169,7 @@ const items: ItemType[] = [
               playsInline
               controls
             >
-              <source src="/videos/ae-transition.mp4" type="video/mp4" />
+              <source src="/videos/叱妖诰.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
