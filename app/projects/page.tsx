@@ -10,8 +10,8 @@ export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState("programming");
 
   const categories = [
-    { id: "programming", name: "Programming/Coding", icon: "🚀" },
-    { id: "design", name: "Design & Media", icon: "🎨" },
+    { id: "programming", name: "Coding", icon: "🚀" },
+    { id: "design", name: "Media", icon: "🎨" },
     { id: "others", name: "Others", icon: "📁" }
   ];
 
@@ -96,8 +96,8 @@ export default function ProjectsPage() {
     },
     {
       id: 9, 
-      title: "Wuwa Edit", 
-      description: "Using After Effects to edit Wuthering Waves using transition effects and creative visual storytelling techniques.",
+      title: "Wuwa Edit - Sanhua", 
+      description: "The best 4-star | Sanhua  #WutheringWaves #ProjectWAVE",
       tech: ["After Effects"], 
       video: "/videos/叱妖诰.mp4",
       behance: "#", 
@@ -228,9 +228,11 @@ export default function ProjectsPage() {
               Live Demo
             </Link>
           )}
-          {project.behance && (
+          {(project.behance || project.video) && (
             <Link
-              href={project.behance}
+              href={project.video || project.behance || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
