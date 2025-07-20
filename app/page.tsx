@@ -161,7 +161,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
               Hi, I&apos;m{" "}
               <TypingAnimation
-                words={["朔望", "Yixi Xie", "a Programmer", "a Video Editor"]}
+                words={["朔望", "Yixi Xie", "a Web Developer", "a Content Creator", "a Salesperson"]}
                 className="text-cyan-400 text-glow"
                 cursorClassName="bg-cyan-400"
                 speed={80}
@@ -329,12 +329,17 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-8 text-white">About Me</h2>
-            <p className="text-lg text-gray-300 mb-8">
-              Focused on creating engaging web experiences and storytelling through video. <br />
-              Skilled at organizing ideas and driving projects from concept to launch.
+            <p className="text-lg text-gray-300 mb-6">
+              Yixi is a recent Computer Science graduate with a passion for crafting responsive websites and developing innovative software solutions. Skilled in modern programming languages and frameworks, he excels at building clean, user-friendly web applications that seamlessly integrate functionality with engaging design.
+            </p>
+            <p className="text-lg text-gray-300 mb-6">
+              Yixi brings a creative edge through video editing and motion graphics, specializing in dynamic, short-form content such as anime clips and game-related videos. Using Adobe After Effects and other creative tools, he enjoys bringing stories to life with dynamic visuals and engaging pacing that resonate with online audiences.
+            </p>
+            <p className="text-lg text-gray-300 mb-6">
+              In addition to his technical and creative skills, Yixi has hands-on experience in product sales. He is skilled in customer engagement, precise follow-up, and achieving sales goals through practical experience and effective communication techniques, helping to build strong client relationships and drive results.
             </p>
             <p className="text-lg text-gray-300">
-              Feel free to explore my portfolio and get in touch if you&apos;d like to collaborate on a project.
+              Eager to continue growing, Yixi is always exploring new technologies, creative strategies, and business opportunities. He looks forward to contributing to projects that blend innovation, design, and real-world impact, while continually evolving across technical, creative, and sales domains.
             </p>
           </motion.div>
         </section>
