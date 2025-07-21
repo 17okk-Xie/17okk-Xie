@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
 import Link from "next/link";
 
@@ -21,6 +21,51 @@ export default function UploadPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [fileError, setFileError] = useState("");
+  const [uploadedProjects, setUploadedProjects] = useState<any[]>([]);
+  const [allProjects, setAllProjects] = useState<any[]>([]);
+  const [showManagement, setShowManagement] = useState(false);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    tech: "",
+    tags: "",
+    status: "Ongoing"
+  });
+
+  // Static design projects from the main projects page
+  const staticDesignProjects = [
+    {
+      id: 9, 
+      title: "Sanhua", 
+      description: "「Wuthering Waves × Sanhua」",
+      tech: ["After Effects"],
+      video: "/videos/叱妖诰.mp4",
+      tags: ["Wuthering Waves", "Project WAVE", "Sanhua"], 
+      status: "Completed",
+      isStatic: true
+    },
+    {
+      id: 7,
+      title: "Transition", 
+      description: "A showcase of advanced transition techniques and motion design principles. Demonstrates seamless scene transitions, dynamic camera movements, and sophisticated visual effects inspired by Wuthering Waves' cinematic style and game aesthetics.",
+      tech: ["After Effects"],
+      video: "/videos/ae-transition.mp4",
+      tags: ["AE Techniques", "Transition", "Wuwa"],
+      status: "Ongoing",
+      isStatic: true
+    },
+    {
+      id: 6,
+      title: "Prototype",
+      description: "An experimental anime-inspired motion graphics prototype exploring advanced After Effects techniques. Created as a proof of concept for dynamic character animations and visual effects inspired by Sword Art Online's distinctive aesthetic and UI elements.",
+      tech: ["After Effects"],
+      video: "/videos/ae-prac.mp4",
+      tags: ["Anime", "Prototype", "Sword Art Online"],
+      status: "Terminated",
+      isStatic: true
+    }
+  ];
 
   // You can change this PIN to whatever you want
   const CORRECT_PIN = "7526";
@@ -72,6 +117,44 @@ export default function UploadPage() {
     }
   }, [isAuthenticated, pinError]);
 
+  // Load existing projects when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadAllProjects();
+    }
+  }, [isAuthenticated]);
+
+  const loadAllProjects = () => {
+    try {
+      // Load uploaded projects
+      const storedUploaded = localStorage.getItem('uploadedProjects');
+      const uploaded = storedUploaded ? JSON.parse(storedUploaded) : [];
+      setUploadedProjects(uploaded);
+
+      // Load modified static projects (if any)
+      const storedStatic = localStorage.getItem('modifiedStaticProjects');
+      const modifiedStatic = storedStatic ? JSON.parse(storedStatic) : {};
+
+      // Load deleted static projects
+      const storedDeleted = localStorage.getItem('deletedStaticProjects');
+      const deletedStatic = storedDeleted ? JSON.parse(storedDeleted) : [];
+
+      // Combine static projects with modifications, excluding deleted ones
+      const activeStaticProjects = staticDesignProjects
+        .filter(project => !deletedStatic.includes(project.id))
+        .map(project => ({
+          ...project,
+          ...(modifiedStatic[project.id] || {})
+        }));
+
+      // Combine all projects
+      const combined = [...uploaded, ...activeStaticProjects];
+      setAllProjects(combined);
+    } catch (error) {
+      console.error("Error loading projects:", error);
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -118,6 +201,9 @@ export default function UploadPage() {
       
       console.log("Project added to design section:", newProject);
       
+      // Reload existing projects to show the new upload
+      loadAllProjects();
+      
       // Reset form
       setUploadFormData({
         title: "",
@@ -130,11 +216,13 @@ export default function UploadPage() {
       setUploadProgress(0);
       setFileError("");
       
-      // Show success message with link to projects
-      const viewProjects = confirm("Video uploaded successfully and added to Media projects! Click OK to view your upload in the Projects page, or Cancel to upload another video.");
+      // Show success message with options
+      const choice = confirm("Video uploaded successfully! Click OK to view in Projects page, or Cancel to manage uploads here.");
       
-      if (viewProjects) {
+      if (choice) {
         window.location.href = '/projects';
+      } else {
+        setShowManagement(true);
       }
       
     } catch (error) {
@@ -185,6 +273,127 @@ export default function UploadPage() {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const startEditingProject = (project: any) => {
+    setEditingProject(project);
+    setEditForm({
+      title: project.title,
+      description: project.description || "",
+      tech: project.tech ? project.tech.join(", ") : "",
+      tags: project.tags ? project.tags.join(", ") : "",
+      status: project.status
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingProject(null);
+    setEditForm({
+      title: "",
+      description: "",
+      tech: "",
+      tags: "",
+      status: "Ongoing"
+    });
+  };
+
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const saveEditedProject = () => {
+    if (!editingProject) return;
+
+    try {
+      const updatedProject = {
+        ...editingProject,
+        title: editForm.title.trim(),
+        description: editForm.description.trim(),
+        tech: editForm.tech ? editForm.tech.split(',').map(t => t.trim()).filter(t => t) : [],
+        tags: editForm.tags ? editForm.tags.split(',').map(t => t.trim()).filter(t => t) : [],
+        status: editForm.status
+      };
+
+      if (editingProject.isStatic) {
+        // Handle static project modification
+        const storedStatic = localStorage.getItem('modifiedStaticProjects');
+        const modifiedStatic = storedStatic ? JSON.parse(storedStatic) : {};
+        
+        modifiedStatic[editingProject.id] = {
+          title: updatedProject.title,
+          description: updatedProject.description,
+          tech: updatedProject.tech,
+          tags: updatedProject.tags,
+          status: updatedProject.status
+        };
+        
+        localStorage.setItem('modifiedStaticProjects', JSON.stringify(modifiedStatic));
+      } else {
+        // Handle uploaded project modification
+        const updatedUploaded = uploadedProjects.map(p => 
+          p.id === editingProject.id ? updatedProject : p
+        );
+        
+        setUploadedProjects(updatedUploaded);
+        localStorage.setItem('uploadedProjects', JSON.stringify(updatedUploaded));
+      }
+
+      // Reload all projects to reflect changes
+      loadAllProjects();
+      cancelEditing();
+      console.log(`Project "${updatedProject.title}" updated successfully`);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      alert("Failed to update project. Please try again.");
+    }
+  };
+
+  const deleteProject = (projectId: number) => {
+    const projectToDelete = allProjects.find(p => p.id === projectId);
+    if (!projectToDelete) return;
+
+    const confirmMessage = `Are you sure you want to permanently delete "${projectToDelete.title}"?\n\nThis action cannot be undone.`;
+    
+    if (confirm(confirmMessage)) {
+      try {
+        if (projectToDelete.isStatic) {
+          // Handle static project deletion (mark as deleted)
+          const storedDeleted = localStorage.getItem('deletedStaticProjects');
+          const deletedStatic = storedDeleted ? JSON.parse(storedDeleted) : [];
+          
+          if (!deletedStatic.includes(projectId)) {
+            deletedStatic.push(projectId);
+            localStorage.setItem('deletedStaticProjects', JSON.stringify(deletedStatic));
+          }
+        } else {
+          // Handle uploaded project deletion (actually remove)
+          const updatedUploaded = uploadedProjects.filter(p => p.id !== projectId);
+          setUploadedProjects(updatedUploaded);
+          localStorage.setItem('uploadedProjects', JSON.stringify(updatedUploaded));
+          
+          // Clean up object URL to prevent memory leaks
+          if (projectToDelete.video && projectToDelete.video.startsWith('blob:')) {
+            URL.revokeObjectURL(projectToDelete.video);
+          }
+        }
+
+        // Close edit mode if deleting the currently edited project
+        if (editingProject?.id === projectId) {
+          cancelEditing();
+        }
+
+        // Reload all projects to reflect changes
+        loadAllProjects();
+        console.log(`Project "${projectToDelete.title}" deleted successfully`);
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        alert("Failed to delete project. Please try again.");
+      }
+    }
   };
 
   const PinForm = () => (
@@ -256,6 +465,333 @@ export default function UploadPage() {
             This area is restricted. Please contact the administrator if you need access.
           </p>
         </div>
+      </div>
+    </motion.div>
+  );
+
+  const EditModal = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={cancelEditing}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-black/90 border border-neutral-800 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full p-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white">Edit Project</h3>
+            </div>
+            <button
+              onClick={cancelEditing}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); saveEditedProject(); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Project Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editForm.title}
+                  onChange={handleEditFormChange}
+                  required
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                  placeholder="Enter project title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                <select
+                  name="status"
+                  value={editForm.status}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-cyan-500"
+                >
+                  <option value="Completed">Completed</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Terminated">Terminated</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+              <textarea
+                name="description"
+                value={editForm.description}
+                onChange={handleEditFormChange}
+                rows={3}
+                className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                placeholder="Describe your project"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Technologies Used</label>
+                <input
+                  type="text"
+                  name="tech"
+                  value={editForm.tech}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                  placeholder="e.g., After Effects, Premiere Pro (comma separated)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Tags</label>
+                <input
+                  type="text"
+                  name="tags"
+                  value={editForm.tags}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500"
+                  placeholder="e.g., Animation, Motion Graphics (comma separated)"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={cancelEditing}
+                className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+
+          {editingProject && (
+            <div className="mt-4 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
+              <p className="text-xs text-gray-400 mb-1">
+                <span className="font-medium">Original file:</span> {editingProject.fileName}
+              </p>
+              <p className="text-xs text-gray-400">
+                <span className="font-medium">Uploaded:</span> {new Date(editingProject.uploadDate).toLocaleDateString()}
+              </p>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+
+  const ManagementSection = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="bg-black/50 backdrop-blur-md rounded-xl overflow-hidden border border-neutral-800/50 shadow-xl mt-8"
+    >
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0"></path>
+                <path d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+              </svg>
+            </div>
+                         <div>
+               <h3 className="text-xl font-semibold text-white">Manage All Media Projects</h3>
+               <p className="text-sm text-gray-400">{allProjects.length} project{allProjects.length !== 1 ? 's' : ''} total ({uploadedProjects.length} uploaded)</p>
+             </div>
+           </div>
+           <button
+             onClick={() => setShowManagement(false)}
+             className="text-gray-400 hover:text-white transition-colors"
+           >
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+               <line x1="18" y1="6" x2="6" y2="18"></line>
+               <line x1="6" y1="6" x2="18" y2="18"></line>
+             </svg>
+           </button>
+         </div>
+
+         {allProjects.length === 0 ? (
+           <div className="text-center py-8">
+             <div className="text-gray-500 text-4xl mb-4">📁</div>
+             <p className="text-gray-400">No media projects found.</p>
+             <p className="text-sm text-gray-500 mt-2">Upload your first project using the form above.</p>
+           </div>
+         ) : (
+           <div className="space-y-4">
+             {allProjects.map((project: any, index: number) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="bg-neutral-800/50 border border-neutral-700 rounded-lg p-4"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Video Thumbnail */}
+                  <div className="w-20 h-20 bg-neutral-700 rounded-lg overflow-hidden flex-shrink-0">
+                    <video
+                      className="w-full h-full object-cover"
+                      muted
+                      loop
+                      autoPlay={false}
+                    >
+                      <source src={project.video} type="video/mp4" />
+                    </video>
+                  </div>
+
+                  {/* Project Info */}
+                                     <div className="flex-1 min-w-0">
+                     <div className="flex items-start justify-between mb-2">
+                       <div>
+                         <div className="flex items-center gap-2 mb-1">
+                           <h4 className="font-medium text-white truncate">{project.title}</h4>
+                           {project.isStatic ? (
+                             <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                               Static
+                             </span>
+                           ) : (
+                             <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                               Uploaded
+                             </span>
+                           )}
+                         </div>
+                         <p className="text-sm text-gray-400 truncate">
+                           {project.isStatic ? 'Built-in project' : project.fileName}
+                         </p>
+                       </div>
+                       <div className="flex items-center gap-2 ml-4">
+                         <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                           project.status === 'Completed' 
+                             ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                             : project.status === 'Ongoing'
+                             ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                             : 'bg-red-500/20 text-red-400 border-red-500/30'
+                         }`}>
+                           {project.status}
+                         </span>
+                       </div>
+                     </div>
+
+                    <p className="text-sm text-gray-400 line-clamp-2 mb-3">{project.description}</p>
+
+                                         <div className="flex items-center justify-between">
+                       <div className="text-xs text-gray-500">
+                         {project.isStatic ? (
+                           <span>Built-in media project</span>
+                         ) : (
+                           <>
+                             <span>{formatFileSize(project.fileSize)}</span>
+                             <span className="mx-2">•</span>
+                             <span>{new Date(project.uploadDate).toLocaleDateString()}</span>
+                           </>
+                         )}
+                       </div>
+
+                                             <div className="flex gap-2">
+                         <button
+                           onClick={() => startEditingProject(project)}
+                           className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded text-xs font-medium transition-colors"
+                         >
+                           Edit
+                         </button>
+                         <button
+                           onClick={() => deleteProject(project.id)}
+                           className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 rounded text-xs font-medium transition-colors"
+                           title={project.isStatic ? "Hide static project" : "Permanently delete upload"}
+                         >
+                           {project.isStatic ? 'Hide' : 'Delete'}
+                         </button>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+                 {/* Show hidden static projects if any */}
+         {(() => {
+           const storedDeleted = localStorage.getItem('deletedStaticProjects');
+           const deletedStatic = storedDeleted ? JSON.parse(storedDeleted) : [];
+           const hiddenProjects = staticDesignProjects.filter(p => deletedStatic.includes(p.id));
+           
+           if (hiddenProjects.length > 0) {
+             return (
+               <div className="mt-6 pt-4 border-t border-neutral-700">
+                 <div className="flex items-center gap-2 mb-3">
+                   <div className="text-orange-400 text-sm">⚠️</div>
+                   <h4 className="text-sm font-medium text-orange-400">Hidden Static Projects ({hiddenProjects.length})</h4>
+                 </div>
+                 <div className="space-y-2">
+                   {hiddenProjects.map((project: any) => (
+                     <div key={project.id} className="flex items-center justify-between bg-neutral-900/50 border border-orange-500/20 rounded-lg p-3">
+                       <div>
+                         <span className="text-sm text-white">{project.title}</span>
+                         <p className="text-xs text-gray-500">Hidden static project</p>
+                       </div>
+                       <button
+                         onClick={() => {
+                           const current = JSON.parse(localStorage.getItem('deletedStaticProjects') || '[]');
+                           const updated = current.filter((id: number) => id !== project.id);
+                           localStorage.setItem('deletedStaticProjects', JSON.stringify(updated));
+                           loadAllProjects();
+                         }}
+                         className="px-3 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/30 rounded text-xs font-medium transition-colors"
+                       >
+                         Restore
+                       </button>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             );
+           }
+           return null;
+         })()}
+
+         <div className="mt-6 pt-4 border-t border-neutral-700 flex gap-3">
+           <button
+             onClick={() => setShowManagement(false)}
+             className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+           >
+             Back to Upload
+           </button>
+           <Link
+             href="/projects"
+             className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-medium transition-colors text-center"
+           >
+             View in Projects
+           </Link>
+         </div>
       </div>
     </motion.div>
   );
@@ -504,7 +1040,7 @@ export default function UploadPage() {
                               />
                             </div>
                             <p className="text-xs text-gray-400 mt-2">
-                              Large files may take several minutes to upload. Please don't close this page.
+                              Large files may take several minutes to upload. Please don&apos;t close this page.
                             </p>
                           </motion.div>
                         )}
@@ -556,34 +1092,65 @@ export default function UploadPage() {
                   </div>
                 </motion.div>
 
-                {/* Additional Info */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6"
-                >
-                  <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
-                    <div className="text-cyan-400 text-2xl mb-3">🎨</div>
-                    <h4 className="text-white font-semibold mb-2">Creative Freedom</h4>
-                    <p className="text-gray-400 text-sm">Express your artistic vision without limitations</p>
-                  </div>
-                  <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
-                    <div className="text-purple-400 text-2xl mb-3">🚀</div>
-                    <h4 className="text-white font-semibold mb-2">Easy Sharing</h4>
-                    <p className="text-gray-400 text-sm">Showcase your work to a global audience</p>
-                  </div>
-                  <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
-                    <div className="text-green-400 text-2xl mb-3">⭐</div>
-                    <h4 className="text-white font-semibold mb-2">Quality Focus</h4>
-                    <p className="text-gray-400 text-sm">High-quality video streaming and presentation</p>
-                  </div>
-                </motion.div>
+                {/* Management Toggle */}
+                {allProjects.length > 0 && !showManagement && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-8 text-center"
+                  >
+                    <button
+                      onClick={() => setShowManagement(true)}
+                      className="inline-flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-6 py-3 rounded-lg font-medium transition-all"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0"></path>
+                        <path d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+                      </svg>
+                      Manage All Projects ({allProjects.length})
+                    </button>
+                  </motion.div>
+                )}
+
+                {/* Show Management Section */}
+                {showManagement && <ManagementSection />}
+
+                {/* Additional Info - Only show when not in management mode */}
+                {!showManagement && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6"
+                  >
+                    <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
+                      <div className="text-cyan-400 text-2xl mb-3">🎨</div>
+                      <h4 className="text-white font-semibold mb-2">Creative Freedom</h4>
+                      <p className="text-gray-400 text-sm">Express your artistic vision without limitations</p>
+                    </div>
+                    <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
+                      <div className="text-purple-400 text-2xl mb-3">🚀</div>
+                      <h4 className="text-white font-semibold mb-2">Easy Sharing</h4>
+                      <p className="text-gray-400 text-sm">Showcase your work to a global audience</p>
+                    </div>
+                    <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-neutral-800/50 text-center">
+                      <div className="text-green-400 text-2xl mb-3">⭐</div>
+                      <h4 className="text-white font-semibold mb-2">Quality Focus</h4>
+                      <p className="text-gray-400 text-sm">High-quality video streaming and presentation</p>
+                    </div>
+                  </motion.div>
+                )}
               </>
             )}
           </motion.div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingProject && <EditModal />}
+      </AnimatePresence>
     </div>
   );
 }
