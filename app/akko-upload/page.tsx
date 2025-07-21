@@ -177,13 +177,12 @@ export default function UploadPage() {
         });
 
       // Combine all projects
-      // @ts-ignore - TypeScript inference issue with union types
       const combined: Project[] = [...uploaded, ...activeStaticProjects];
       setAllProjects(combined);
     } catch (error) {
       console.error("Error loading projects:", error);
     }
-  }, []);
+  }, [staticDesignProjects]);
 
   // Load existing projects when authenticated
   useEffect(() => {
@@ -312,7 +311,7 @@ export default function UploadPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const startEditingProject = (project: any) => {
+  const startEditingProject = (project: Project) => {
     setEditingProject(project);
     setEditForm({
       title: project.title,
@@ -698,7 +697,7 @@ export default function UploadPage() {
            </div>
          ) : (
            <div className="space-y-4">
-             {allProjects.map((project: any, index: number) => (
+             {allProjects.map((project: Project, index: number) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -808,7 +807,7 @@ export default function UploadPage() {
                    <h4 className="text-sm font-medium text-orange-400">Hidden Static Projects ({hiddenProjects.length})</h4>
                  </div>
                  <div className="space-y-2">
-                   {hiddenProjects.map((project: any) => (
+                   {hiddenProjects.map((project: StaticProject) => (
                      <div key={project.id} className="flex items-center justify-between bg-neutral-900/50 border border-orange-500/20 rounded-lg p-3">
                        <div>
                          <span className="text-sm text-white">{project.title}</span>
