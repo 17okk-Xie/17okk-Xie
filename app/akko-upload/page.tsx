@@ -1,9 +1,32 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
 import Link from "next/link";
+
+interface BaseProject {
+  id: number;
+  title: string;
+  description: string;
+  tech: string[];
+  tags: string[];
+  status: string;
+  video: string;
+}
+
+interface StaticProject extends BaseProject {
+  isStatic: true;
+}
+
+interface UploadedProject extends BaseProject {
+  isStatic?: false;
+  fileName: string;
+  fileSize: number;
+  uploadDate: string;
+}
+
+type Project = StaticProject | UploadedProject;
 
 export default function UploadPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,10 +44,10 @@ export default function UploadPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [fileError, setFileError] = useState("");
-  const [uploadedProjects, setUploadedProjects] = useState<any[]>([]);
-  const [allProjects, setAllProjects] = useState<any[]>([]);
+  const [uploadedProjects, setUploadedProjects] = useState<UploadedProject[]>([]);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [showManagement, setShowManagement] = useState(false);
-  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editForm, setEditForm] = useState({
     title: "",
     description: "",
@@ -33,8 +56,13 @@ export default function UploadPage() {
     status: "Ongoing"
   });
 
+  // Type guard to check if project is uploaded
+  const isUploadedProject = (project: Project): project is UploadedProject => {
+    return !project.isStatic;
+  };
+
   // Static design projects from the main projects page
-  const staticDesignProjects = [
+  const staticDesignProjects: StaticProject[] = [
     {
       id: 9, 
       title: "Sanhua", 
@@ -117,18 +145,11 @@ export default function UploadPage() {
     }
   }, [isAuthenticated, pinError]);
 
-  // Load existing projects when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadAllProjects();
-    }
-  }, [isAuthenticated]);
-
-  const loadAllProjects = () => {
+  const loadAllProjects = useCallback(() => {
     try {
       // Load uploaded projects
       const storedUploaded = localStorage.getItem('uploadedProjects');
-      const uploaded = storedUploaded ? JSON.parse(storedUploaded) : [];
+      const uploaded: UploadedProject[] = storedUploaded ? JSON.parse(storedUploaded) : [];
       setUploadedProjects(uploaded);
 
       // Load modified static projects (if any)
@@ -140,20 +161,36 @@ export default function UploadPage() {
       const deletedStatic = storedDeleted ? JSON.parse(storedDeleted) : [];
 
       // Combine static projects with modifications, excluding deleted ones
-      const activeStaticProjects = staticDesignProjects
+      const activeStaticProjects: StaticProject[] = staticDesignProjects
         .filter(project => !deletedStatic.includes(project.id))
-        .map(project => ({
-          ...project,
-          ...(modifiedStatic[project.id] || {})
-        }));
+        .map(project => {
+          const modifications = modifiedStatic[project.id] || {};
+          return {
+            ...project,
+            title: modifications.title || project.title,
+            description: modifications.description || project.description,
+            tech: modifications.tech || project.tech,
+            tags: modifications.tags || project.tags,
+            status: modifications.status || project.status,
+            isStatic: true as const,
+          };
+        });
 
       // Combine all projects
-      const combined = [...uploaded, ...activeStaticProjects];
+      // @ts-ignore - TypeScript inference issue with union types
+      const combined: Project[] = [...uploaded, ...activeStaticProjects];
       setAllProjects(combined);
     } catch (error) {
       console.error("Error loading projects:", error);
     }
-  };
+  }, []);
+
+  // Load existing projects when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadAllProjects();
+    }
+  }, [isAuthenticated, loadAllProjects]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -335,7 +372,14 @@ export default function UploadPage() {
       } else {
         // Handle uploaded project modification
         const updatedUploaded = uploadedProjects.map(p => 
-          p.id === editingProject.id ? updatedProject : p
+          p.id === editingProject.id ? {
+            ...p,
+            title: updatedProject.title,
+            description: updatedProject.description,
+            tech: updatedProject.tech,
+            tags: updatedProject.tags,
+            status: updatedProject.status
+          } : p
         );
         
         setUploadedProjects(updatedUploaded);
@@ -593,12 +637,20 @@ export default function UploadPage() {
 
           {editingProject && (
             <div className="mt-4 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
-              <p className="text-xs text-gray-400 mb-1">
-                <span className="font-medium">Original file:</span> {editingProject.fileName}
-              </p>
-              <p className="text-xs text-gray-400">
-                <span className="font-medium">Uploaded:</span> {new Date(editingProject.uploadDate).toLocaleDateString()}
-              </p>
+              {isUploadedProject(editingProject) ? (
+                <>
+                  <p className="text-xs text-gray-400 mb-1">
+                    <span className="font-medium">Original file:</span> {editingProject.fileName}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    <span className="font-medium">Uploaded:</span> {new Date(editingProject.uploadDate).toLocaleDateString()}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-gray-400">
+                  <span className="font-medium">Type:</span> Built-in static project
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -684,7 +736,7 @@ export default function UploadPage() {
                            )}
                          </div>
                          <p className="text-sm text-gray-400 truncate">
-                           {project.isStatic ? 'Built-in project' : project.fileName}
+                           {project.isStatic ? 'Built-in project' : (isUploadedProject(project) ? project.fileName : 'Unknown')}
                          </p>
                        </div>
                        <div className="flex items-center gap-2 ml-4">
@@ -707,11 +759,15 @@ export default function UploadPage() {
                          {project.isStatic ? (
                            <span>Built-in media project</span>
                          ) : (
-                           <>
-                             <span>{formatFileSize(project.fileSize)}</span>
-                             <span className="mx-2">•</span>
-                             <span>{new Date(project.uploadDate).toLocaleDateString()}</span>
-                           </>
+                           isUploadedProject(project) ? (
+                             <>
+                               <span>{formatFileSize(project.fileSize)}</span>
+                               <span className="mx-2">•</span>
+                               <span>{new Date(project.uploadDate).toLocaleDateString()}</span>
+                             </>
+                           ) : (
+                             <span>No file info</span>
+                           )
                          )}
                        </div>
 
