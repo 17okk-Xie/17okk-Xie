@@ -87,6 +87,15 @@ export default function ProjectsPage() {
 
   const designProjects = [
     {
+      id: 10,
+      title: "Jinhsi",
+      description: "「Wuthering Waves × Jinhsi」",
+      tech: ["After Effects"],
+      video: "/videos/小今子.mp4",
+      tags: ["Wuthering Waves", "Project WAVE", "Jinhsi"],
+      status: "Completed"
+    },
+    {
       id: 9, 
       title: "Sanhua", 
       description: "「Wuthering Waves × Sanhua」",
