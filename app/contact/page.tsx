@@ -123,15 +123,15 @@ export default function ContactPage() {
                   <div className="p-6">
                     <div className="flex flex-col items-center mb-6">
                       <Link 
-                        href="/resume/Resume.pdf" 
-                        title="Click to view my resume"
+                        href="/akko-upload" 
+                        title="Akko Upload"
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-cyan-400 mb-4 hover:border-cyan-300 transition-colors cursor-pointer group"
                       >
                         <Image
                           src="/images/Yixi.jpeg"
-                          alt="Click to view resume - Yixi Xie"
+                          alt="Akko"
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                           priority

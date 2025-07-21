@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Meteors } from "../../components/magicui/meteors";
 import { Modal, ModalBody, ModalContent, ModalTrigger } from "../../components/ui/animated-modal";
@@ -9,6 +9,7 @@ import Image from "next/image";
 
 export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState("programming");
+  const [uploadedProjects, setUploadedProjects] = useState<any[]>([]);
 
   const categories = [
     { id: "programming", name: "Coding", icon: "🚀" },
@@ -77,13 +78,13 @@ export default function ProjectsPage() {
 
   const designProjects = [
     {
-      id: 6,
-      title: "Prototype",
-      description: "An experimental anime-inspired motion graphics prototype exploring advanced After Effects techniques. Created as a proof of concept for dynamic character animations and visual effects inspired by Sword Art Online's distinctive aesthetic and UI elements.",
+      id: 9, 
+      title: "Sanhua", 
+      description: "「Wuthering Waves × Sanhua」",
       tech: ["After Effects"],
-      video: "/videos/ae-prac.mp4",
-      tags: ["Anime", "Prototype", "Sword Art Online"],
-      status: "Terminated"
+      video: "/videos/叱妖诰.mp4",
+      tags: ["Wuthering Waves", "Project WAVE", "Sanhua"], 
+      status: "Completed"
     },
     {
       id: 7,
@@ -95,18 +96,76 @@ export default function ProjectsPage() {
       status: "Ongoing"
     },
     {
-      id: 9, 
-      title: "Sanhua", 
-      description: "The best 4-star | Sanhua",
+      id: 6,
+      title: "Prototype",
+      description: "An experimental anime-inspired motion graphics prototype exploring advanced After Effects techniques. Created as a proof of concept for dynamic character animations and visual effects inspired by Sword Art Online's distinctive aesthetic and UI elements.",
       tech: ["After Effects"],
-      video: "/videos/叱妖诰.mp4",
-      tags: ["Wuthering Waves", "Project WAVE", "Sanhua"], 
-      status: "Completed"
+      video: "/videos/ae-prac.mp4",
+      tags: ["Anime", "Prototype", "Sword Art Online"],
+      status: "Terminated"
     }
   ];
 
+  // Load uploaded projects from localStorage on component mount
+  useEffect(() => {
+    const loadUploadedProjects = () => {
+      try {
+        const stored = localStorage.getItem('uploadedProjects');
+        if (stored) {
+          const projects = JSON.parse(stored);
+          setUploadedProjects(projects);
+        }
+      } catch (error) {
+        console.error("Error loading uploaded projects:", error);
+      }
+    };
+
+    loadUploadedProjects();
+
+    // Listen for storage changes (when new projects are uploaded)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'uploadedProjects') {
+        loadUploadedProjects();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for focus events to catch uploads from the same tab
+    const handleFocus = () => {
+      loadUploadedProjects();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
+  const deleteUploadedProject = (projectId: number) => {
+    try {
+      const updatedProjects = uploadedProjects.filter(p => p.id !== projectId);
+      setUploadedProjects(updatedProjects);
+      localStorage.setItem('uploadedProjects', JSON.stringify(updatedProjects));
+      
+      // Clean up object URL to prevent memory leaks
+      const projectToDelete = uploadedProjects.find(p => p.id === projectId);
+      if (projectToDelete && projectToDelete.video) {
+        URL.revokeObjectURL(projectToDelete.video);
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
+
   const getFilteredProjects = () => {
-    return activeCategory === "design" ? designProjects : programmingProjects;
+    if (activeCategory === "design") {
+      // Combine uploaded projects with static design projects
+      return [...uploadedProjects, ...designProjects];
+    }
+    return programmingProjects;
   };
 
   interface Project {
@@ -154,7 +213,13 @@ export default function ProjectsPage() {
           </div>
         )}
         
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex gap-2">
+          {/* Upload indicator for user-uploaded projects */}
+          {(project as any).uploadDate && (
+            <span className="px-2 py-1 rounded-full text-xs font-medium border bg-purple-500/20 text-purple-400 border-purple-500/30">
+              📤 Uploaded
+            </span>
+          )}
           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
             project.status === 'Completed' 
               ? 'bg-green-500/20 text-green-400 border-green-500/30' 
@@ -176,6 +241,20 @@ export default function ProjectsPage() {
           <p className="text-gray-400 text-sm mb-4 line-clamp-3">
             {project.description}
           </p>
+        )}
+
+        {/* Upload info for user-uploaded projects */}
+        {(project as any).uploadDate && (
+          <div className="mb-4 p-2 bg-purple-500/5 border border-purple-500/20 rounded text-xs text-purple-300">
+            <div className="flex items-center justify-between">
+              <span>📅 Uploaded: {new Date((project as any).uploadDate).toLocaleDateString()}</span>
+              {(project as any).fileName && (
+                <span className="text-gray-400 truncate ml-2 max-w-[120px]">
+                  {(project as any).fileName}
+                </span>
+              )}
+            </div>
+          </div>
         )}
 
         {project.tech && (
@@ -274,6 +353,26 @@ export default function ProjectsPage() {
               </ModalBody>
             </Modal>
           )}
+          {/* Delete button for uploaded projects */}
+          {(project as any).uploadDate && (
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this uploaded project?')) {
+                  deleteUploadedProject(project.id);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              title="Delete uploaded project"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              Delete
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
@@ -333,6 +432,8 @@ export default function ProjectsPage() {
                 ))}
               </div>
             </div>
+
+
 
             {/* Projects Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
