@@ -197,7 +197,7 @@ export default function Home() {
                       <h3 className="text-xl font-semibold mb-4">Connect with me on WeChat</h3>
                       <div className="relative w-full aspect-square max-w-md overflow-hidden bg-white p-2 rounded-xl mb-3">
                         <Image
-                          src="/images/QR-code.JPG"
+                          src="/images/QR-code.jpeg"
                           alt="WeChat QR Code"
                           fill
                           className="object-contain"
