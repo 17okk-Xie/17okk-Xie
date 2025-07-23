@@ -87,6 +87,15 @@ export default function ProjectsPage() {
 
   const designProjects = [
     {
+      id: 11,
+      title: "Phrolova",
+      description: "30 Seconds to Fall in Love with Phrolova!「Wuthering Waves × Phrolova × Bet On Me」",
+      tech: ["After Effects"],
+      video: "/videos/Phrolova.mp4",
+      tags: ["Wuthering Waves", "Project WAVE", "Phrolova"],
+      status: "Completed"
+    },
+    {
       id: 10,
       title: "Jinhsi",
       description: "「Wuthering Waves × Jinhsi」",
